@@ -1,4 +1,11 @@
 # Parse and print out Qualys QIDs 
+__author__ = "Luis Nunez"
+
+__license__ = "GPLv3"
+__version__ = "0.1.0"
+__maintainer__ = "Luis Nunez"
+__status__ = "Prototype"
+
 import re
 import csv
 import copy
