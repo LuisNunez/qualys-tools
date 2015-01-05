@@ -2,6 +2,15 @@
 # csvlen.py
 # Script looks for large fields in CSV files.
 
+__author__ = "Luis Nunez"
+__copyright__ = "Copyright 2014, C3isecurity"
+
+__license__ = "GPLv3"
+__version__ = "0.1.0"
+__maintainer__ = "Luis Nunez"
+__status__ = "Prototype"
+
+
 # CSV Filer Cleaner class need for blank line in CSV files.
 class CSVFileCleaner:
     def __init__ (self, file_to_wrap, comment_starts=('#', '//', '-- ')):
