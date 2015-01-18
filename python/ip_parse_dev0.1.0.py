@@ -9,7 +9,6 @@ count_lines = 0
 count_range = 0
 count_diff_octet = 0
 count_x = 0
-# met_assetgroup_list.csv
 
 with open('file.csv','r') as csvfile:
 	csvreader = csv.reader(csvfile)
@@ -23,9 +22,9 @@ with open('file.csv','r') as csvfile:
 		# Find a '-' in the row.  Detect a range entrAsset_Group_IP.
 		z = Asset_Group.find('-')
 		
-		# If '-' is detected parse and split out to string.
+		# If '-' is detected, parse and split into string.
 		if z > 1:
-			# Split the to IP address between the '-'.
+			# Split the IP address between the '-'.
 			Asset_Group_IP = Asset_Group.split('-')
 			# split out the IP Address
 			IP_a = Asset_Group_IP[0]
