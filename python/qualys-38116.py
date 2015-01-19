@@ -5,13 +5,17 @@
 # version 0.1.0
 # prototype 
 
-from lxml import etree, objectify
 import sys 
+import csv
+from lxml import etree, objectify
 from sys import argv
 
-#----------------------------------------------------------------------
+
 def parseXML(xmlFile):
-    """"""
+    #""" test """
+    csvfile = open('test_csv.csv','w')
+    writer = csv.writer(csvfile, quoting=csv.QUOTE_ALL)
+
     with open(xmlFile) as f:
         xml = f.read()
  
@@ -74,13 +78,19 @@ def parseXML(xmlFile):
 
         #print "---------------------------------"
         sys.stdout.write(scan_date + ", " + ip_e + ", " + os_e + ", " + dns_e + ", ")
+        
+        results_csv = []
         for z in SSLTLS_out:
             results_eee = z.replace('\n',', ')
             results_x = results_eee.replace('\t','')
             sys.stdout.write(results_x + ", ")
+            results_csv.append(results_x)
         sys.stdout.write("\n")
-        SSLTLS_out = []
+        writer.writerow((scan_date, ip_e, os_e, dns_e, results_csv))
+        #writer.writerow((results_csv))
 
+        SSLTLS_out = []
+    csvfile.close()
 #----------------------------------------------------------------------
 if __name__ == "__main__":
     #f = r'38116.xml'
