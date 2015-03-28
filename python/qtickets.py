@@ -1,12 +1,15 @@
 
 __author__ = "Luis Nunez"
 __license__ = "GPLv3"
-__version__ = "0.1.17"
+__version__ = "0.1.20"
 __maintainer__ = "Luis Nunez"
 __status__ = "Prototype"
 
-import qualysapi
 import logging
+# Logging is configured here becasue qaulysapi include logging.
+# Need to look into this issue.
+logging.basicConfig(filename='qtickets.log', level=logging.INFO, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
+import qualysapi
 from lxml import etree, objectify
 from datetime import datetime
 import sys
@@ -16,7 +19,6 @@ import sys
 
 # Connect to Qualys Guard
 def QualysConnect(get_state, assignee, last_line_num, file_number):
-
     Truncation = 1
     file_num = file_number
     while (Truncation == 1):
@@ -27,13 +29,13 @@ def QualysConnect(get_state, assignee, last_line_num, file_number):
         print "Connection: %s" % file_num
         #print "Trunction: %s" % Truncation
         qgs=qualysapi.connect()
+
         # Request data
         if last_line_num == 0:
             print " Intitial get"
             logging.info('Last Line Number: %s', last_line_num)
             logging.info('Get State: %s', get_state)
             ret = qgs.request('ticket_list.php', {'states':get_state, 'ticket_assignee':assignee})
-        # print qgs.request('ticket_list.php', {'states':'OPEN', 'since_ticket_number':'89358'})
             print "Open out_file %s" % file_num
             snum = str(file_num)
             xmlfile = get_state + snum + ".xml"
@@ -59,7 +61,6 @@ def QualysConnect(get_state, assignee, last_line_num, file_number):
             out_file.close()
             print "File Number: %s" % file_num
             logging.info('Closed File: ', xmlfile)
-            #file_num =+ 1
 
         # XML file processing section.
         print "Process XML file"
@@ -91,6 +92,12 @@ def QualysConnect(get_state, assignee, last_line_num, file_number):
                 #return last_line_num
                 #print "For loop Truncation %s: " % Truncation
                 logging.info('Trunction found %s', xmlfile)
+            elif ticket_line.tag == "ERROR":
+                Truncation = 0
+                logging.info('Truncation = 0')
+                logging.info('ERROR found in %s', xmlfile)
+                print "Error found in %s" % xmlfile
+                print ticket_line.tag, ticket_line.attrib
             else:
             # print "Truncation Not Found"
                 Truncation = 0
@@ -100,8 +107,8 @@ def QualysConnect(get_state, assignee, last_line_num, file_number):
         print "Truncation %s: " % Truncation
 
 def main():
-    logging.basicConfig(filename='qtickets.log', level=logging.INFO, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
-    logging.info('Start QTickets Script')
+    #logging.basicConfig(filename='qtickets1.log', level=logging.INFO, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
+    logging.info('Start Qualys Tickets Script version:%s' % __version__ )
     print "version:", __version__
     # QualysConnect('CLOSED', 0)
     QualysConnect('OPEN', 'username', 0, 1)
