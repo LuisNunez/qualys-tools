@@ -1,7 +1,7 @@
 
 __author__ = "Luis Nunez"
 __license__ = "GPLv3"
-__version__ = "0.1.20"
+__version__ = "0.1.23"
 __maintainer__ = "Luis Nunez"
 __status__ = "Prototype"
 
@@ -9,10 +9,14 @@ import logging
 # Logging is configured here becasue qaulysapi include logging.
 # Need to look into this issue.
 logging.basicConfig(filename='qtickets.log', level=logging.INFO, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
+
+import os
+import sys
+import argparse
 import qualysapi
 from lxml import etree, objectify
 from datetime import datetime
-import sys
+
 
 # This script is used to pull Remediation Ticket data from the Qualys
 # Guard.
@@ -20,15 +24,17 @@ import sys
 # Connect to Qualys Guard
 def QualysConnect(get_state, assignee, last_line_num, file_number):
     Truncation = 1
+    session_count = 1
     file_num = file_number
     while (Truncation == 1):
         print "+ - - - - - - - - - - - - -"
         print "Connecting To QualysGuard"
         logging.info('Connecting To QualysGuard')
-        logging.info('Connection %s', file_num)
-        print "Connection: %s" % file_num
+        logging.info('Session %s', session_count)
+        print "Session: %s" % session_count
         #print "Trunction: %s" % Truncation
         qgs=qualysapi.connect()
+        session_count += 1
 
         # Request data
         if last_line_num == 0:
@@ -46,7 +52,10 @@ def QualysConnect(get_state, assignee, last_line_num, file_number):
             #file_num += 1
             print "close %s" % out_file
             out_file.close()
-            logging.info('Closed File: ', xmlfile)
+            logging.info('Closed File: %s', xmlfile)
+            file_stat = os.stat(xmlfile)
+            print "File size %s %s" % (xmlfile, file_stat.st_size)
+            logging.info('File size %s %s', xmlfile, file_stat.st_size)
         else:
             print "Follow on Since Ticket Number"
             logging.info('Last Line Number: %s', last_line_num)
@@ -60,7 +69,10 @@ def QualysConnect(get_state, assignee, last_line_num, file_number):
             out_file.write(ret)
             out_file.close()
             print "File Number: %s" % file_num
-            logging.info('Closed File: ', xmlfile)
+            logging.info('Closed File: %s', xmlfile)
+            file_stat = os.stat(xmlfile)
+            print "File size %s %s" % (xmlfile,file_stat.st_size)
+            logging.info('File size %s %s', xmlfile, file_stat.st_size)
 
         # XML file processing section.
         print "Process XML file"
@@ -107,11 +119,16 @@ def QualysConnect(get_state, assignee, last_line_num, file_number):
         print "Truncation %s: " % Truncation
 
 def main():
+    parser = argparse.ArgumentParser(description = "Qualys Ticket Request script. Version %s" % __version__)
+    parser.add_argument("-l", "--last_line_num", dest = 'last_line_num', action='store', default= 0, type=int, help='Default is 0. Request record for processing.')
+    parser.add_argument("-f", "--file_number", dest = 'file_num', action='store', default= 1, type=int, help='Default is 1. Request next file number for processing.')
+    args = parser.parse_args()
+
     #logging.basicConfig(filename='qtickets1.log', level=logging.INFO, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
-    logging.info('Start Qualys Tickets Script version:%s' % __version__ )
-    print "version:", __version__
+    logging.info('Start Qualys Tickets Script version:%s', __version__ )
+    print "Qualys Tickets Script version:", __version__
     # QualysConnect('CLOSED', 0)
-    QualysConnect('OPEN', 'username', 0, 1)
+    QualysConnect('OPEN', 'username', args.last_line_num, args.file_num)
     # QualysConnect('RESOLVED', 0)
     # QualysConnect('IGNORED', 2066252)
 
